@@ -71,7 +71,7 @@ const CustomerLogin = () => {
           </button>
         </form>
         <p className="register-link">
-          Don't have an account? <Link to="/customer/register">Register</Link>
+          Don't have an account? <Link to="/signup">Register</Link>
         </p>
       </div>
     </div>

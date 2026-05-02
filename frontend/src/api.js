@@ -22,6 +22,20 @@ const parseResponse = async (response) => {
 };
 
 export const api = {
+  auth: {
+    login: (credentials) => fetch(`${API_BASE_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(credentials),
+    }).then(parseResponse),
+
+    signup: (data) => fetch(`${API_BASE_URL}/auth/signup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    }).then(parseResponse),
+  },
+
   superAdmin: {
     login: (credentials) => fetch(`${API_BASE_URL}/superadmin/login`, {
       method: 'POST',
@@ -49,6 +63,17 @@ export const api = {
     deleteTenant: (id) => fetch(`${API_BASE_URL}/superadmin/tenants/${id}`, {
       method: 'DELETE',
       headers: getHeaders(),
+    }).then(parseResponse),
+
+    getUsers: () => fetch(`${API_BASE_URL}/superadmin/users`, {
+      method: 'GET',
+      headers: getHeaders(),
+    }).then(parseResponse),
+
+    updateUserRole: (id, role) => fetch(`${API_BASE_URL}/superadmin/users/${id}/role`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify({ role }),
     }).then(parseResponse),
   },
 

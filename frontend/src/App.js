@@ -1,22 +1,20 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { useAuth } from './context/AuthContext';
 import Navbar from './components/common/Navbar';
 import ProtectedRoute from './components/common/ProtectedRoute';
 
 // Super Admin Pages
-import SuperAdminLogin from './pages/superadmin/SuperAdminLogin';
 import SuperAdminDashboard from './pages/superadmin/SuperAdminDashboard';
 
 // Barber Pages
-import BarberLogin from './pages/barber/BarberLogin';
 import BarberDashboard from './pages/barber/BarberDashboard';
 
 // Customer Pages
-import CustomerLogin from './pages/customer/CustomerLogin';
-import CustomerRegister from './pages/customer/CustomerRegister';
 import CustomerDashboard from './pages/customer/CustomerDashboard';
+import Login from './pages/auth/Login';
+import Signup from './pages/auth/Signup';
 
 import './App.css';
 
@@ -31,31 +29,34 @@ function App() {
               {/* Root redirect */}
               <Route path="/" element={<Home />} />
               
-              {/* Super Admin Routes */}
-              <Route path="/superadmin/login" element={<SuperAdminLogin />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/superadmin/login" element={<Navigate to="/login" replace />} />
+              <Route path="/barber/login" element={<Navigate to="/login" replace />} />
+              <Route path="/customer/login" element={<Navigate to="/login" replace />} />
+              <Route path="/customer/register" element={<Navigate to="/signup" replace />} />
+
+              {/* Admin Routes */}
               <Route 
                 path="/superadmin/dashboard" 
                 element={
-                  <ProtectedRoute allowedRoles={['superadmin']}>
+                  <ProtectedRoute allowedRoles={['superadmin', 'admin']}>
                     <SuperAdminDashboard />
                   </ProtectedRoute>
                 } 
               />
               
               {/* Barber Routes */}
-              <Route path="/barber/login" element={<BarberLogin />} />
               <Route 
                 path="/barber/dashboard" 
                 element={
-                  <ProtectedRoute allowedRoles={['barber', 'admin']}>
+                  <ProtectedRoute allowedRoles={['barber']}>
                     <BarberDashboard />
                   </ProtectedRoute>
                 } 
               />
               
               {/* Customer Routes */}
-              <Route path="/customer/login" element={<CustomerLogin />} />
-              <Route path="/customer/register" element={<CustomerRegister />} />
               <Route 
                 path="/customer/dashboard" 
                 element={
@@ -113,11 +114,13 @@ const Home = () => {
   const { user } = useAuth();
   const dashboardPath = user?.role === 'superadmin'
     ? '/superadmin/dashboard'
-    : user?.role === 'customer'
-      ? '/customer/dashboard'
-      : user?.role === 'barber' || user?.role === 'admin'
-        ? '/barber/dashboard'
-        : '/barber/login';
+    : user?.role === 'admin'
+      ? '/superadmin/dashboard'
+      : user?.role === 'customer'
+        ? '/customer/dashboard'
+        : user?.role === 'barber'
+          ? '/barber/dashboard'
+          : '/login';
 
   return (
     <div className="home-container">
@@ -134,9 +137,17 @@ const Home = () => {
               <p>{slide.text}</p>
               <div className="hero-actions">
                 <Link className="card-button primary-cta" to={dashboardPath}>
-                  {user ? 'Open Dashboard' : 'Barber Login'}
+                  {user ? 'Open Dashboard' : 'Login'}
                 </Link>
-                <Link className="card-button secondary-cta" to="/customer/login">Book Appointment</Link>
+                <Link className="card-button secondary-cta" to="/signup">Signup</Link>
+                <a
+                  className="card-button map-button hero-map-button"
+                  href="https://www.google.com/maps/search/?api=1&query=barber+shop"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Open Map
+                </a>
               </div>
             </div>
             <div className="carousel-count">0{index + 1} / 03</div>
@@ -168,22 +179,22 @@ const Home = () => {
         </div>
         <div className="home-links">
           <div className="home-card">
-            <span className="role-label">Admin</span>
-            <h3>Super Admin</h3>
-            <p>Manage shops, accounts, and platform-level controls.</p>
-            <Link className="card-button" to="/superadmin/login">Open</Link>
+            <span className="role-label">Account</span>
+            <h3>Single Login</h3>
+            <p>Customers, barbers, and admins all enter through the same secure login.</p>
+            <Link className="card-button" to="/login">Open</Link>
           </div>
           <div className="home-card featured-card">
-            <span className="role-label">Shop</span>
-            <h3>Barber Shop</h3>
-            <p>Handle services, requests, approvals, and performance stats.</p>
-            <Link className="card-button" to="/barber/login">Open</Link>
+            <span className="role-label">New customer</span>
+            <h3>Signup</h3>
+            <p>Create a customer account, book visits, and manage appointments.</p>
+            <Link className="card-button" to="/signup">Open</Link>
           </div>
           <div className="home-card">
-            <span className="role-label">Client</span>
-            <h3>Customer</h3>
-            <p>Book visits and manage upcoming appointments.</p>
-            <Link className="card-button" to="/customer/login">Open</Link>
+            <span className="role-label">Directions</span>
+            <h3>Find Us</h3>
+            <p>Open the map and get directions when you are ready to visit.</p>
+            <a className="card-button" href="https://www.google.com/maps/search/?api=1&query=barber+shop" target="_blank" rel="noreferrer">Open Map</a>
           </div>
         </div>
       </div>

@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 
 const SuperAdminDashboard = () => {
   const [tenants, setTenants] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState('');
@@ -25,17 +26,19 @@ const SuperAdminDashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchTenants();
+    fetchDashboardData();
   }, []);
 
-  const fetchTenants = async () => {
+  const fetchDashboardData = async () => {
     try {
-      const response = await api.superAdmin.getTenants();
-      if (response.tenants) {
-        setTenants(response.tenants);
-      }
+      const [tenantsResponse, usersResponse] = await Promise.all([
+        api.superAdmin.getTenants(),
+        api.superAdmin.getUsers()
+      ]);
+      setTenants(tenantsResponse.tenants || []);
+      setUsers(usersResponse.users || []);
     } catch (error) {
-      console.error('Error fetching tenants:', error);
+      console.error('Error fetching dashboard data:', error);
     } finally {
       setLoading(false);
     }
@@ -72,7 +75,7 @@ const SuperAdminDashboard = () => {
           ownerPassword: '',
           subscriptionPlan: 'free'
         });
-        fetchTenants();
+        fetchDashboardData();
       } else {
         setFormError(response.message || 'Failed to create tenant');
       }
@@ -87,7 +90,7 @@ const SuperAdminDashboard = () => {
     if (window.confirm('Are you sure you want to delete this tenant?')) {
       try {
         await api.superAdmin.deleteTenant(id);
-        fetchTenants();
+        fetchDashboardData();
       } catch (error) {
         alert('Error deleting tenant');
       }
@@ -97,9 +100,18 @@ const SuperAdminDashboard = () => {
   const handleToggleActive = async (tenant) => {
     try {
       await api.superAdmin.updateTenant(tenant._id, { isActive: !tenant.isActive });
-      fetchTenants();
+      fetchDashboardData();
     } catch (error) {
       alert('Error updating tenant');
+    }
+  };
+
+  const handleRoleChange = async (userId, role) => {
+    try {
+      await api.superAdmin.updateUserRole(userId, role);
+      fetchDashboardData();
+    } catch (error) {
+      alert(error.message || 'Error updating user role');
     }
   };
 
@@ -110,6 +122,8 @@ const SuperAdminDashboard = () => {
 
   const activeCount = tenants.filter(tenant => tenant.isActive).length;
   const inactiveCount = tenants.length - activeCount;
+  const customerCount = users.filter(user => user.role === 'customer').length;
+  const barberCount = users.filter(user => user.role === 'barber').length;
 
   if (loading) {
     return <div className="loading">Loading...</div>;
@@ -138,6 +152,14 @@ const SuperAdminDashboard = () => {
           <div className="summary-card">
             <h3>Inactive</h3>
             <p className="summary-number">{inactiveCount}</p>
+          </div>
+          <div className="summary-card">
+            <h3>Customers</h3>
+            <p className="summary-number">{customerCount}</p>
+          </div>
+          <div className="summary-card">
+            <h3>Barbers</h3>
+            <p className="summary-number">{barberCount}</p>
           </div>
         </div>
 
@@ -224,6 +246,58 @@ const SuperAdminDashboard = () => {
             )}
           </tbody>
         </table>
+
+        <div className="section-header user-role-header">
+          <div>
+            <h2>User Role Management</h2>
+            <p className="dashboard-subtitle">Signup creates customers by default. Only admin can upgrade a user role.</p>
+          </div>
+        </div>
+
+        <div className="table-panel">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Role</th>
+                <th>Change Role</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.length > 0 ? (
+                users.map(user => (
+                  <tr key={user._id}>
+                    <td>{user.name}</td>
+                    <td>{user.email}</td>
+                    <td>{user.phone || 'Not added'}</td>
+                    <td>
+                      <span className={`status-badge ${user.role}`}>
+                        {user.role}
+                      </span>
+                    </td>
+                    <td>
+                      <select
+                        className="role-select"
+                        value={user.role}
+                        onChange={(e) => handleRoleChange(user._id, e.target.value)}
+                      >
+                        <option value="customer">Customer</option>
+                        <option value="barber">Barber</option>
+                        <option value="admin">Admin</option>
+                      </select>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5">No users found</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {showModal && (

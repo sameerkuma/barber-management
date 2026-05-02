@@ -1162,6 +1162,18 @@ body {
   background: rgba(255, 255, 255, 0.22);
 }
 
+.map-button,
+.hero-map-button {
+  background: var(--teal);
+  color: white;
+}
+
+.map-button:hover,
+.hero-map-button:hover {
+  background: #0b5f59;
+  color: white;
+}
+
 .home-section {
   padding-top: 2rem;
 }
@@ -1340,6 +1352,70 @@ body {
 
 .login-submit:hover:not(:disabled) {
   background: var(--teal);
+}
+
+.auth-page {
+  min-height: calc(100vh - 96px);
+  display: grid;
+  grid-template-columns: minmax(320px, 1fr) minmax(320px, 480px);
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.auth-art {
+  min-height: 620px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: clamp(1.6rem, 5vw, 4rem);
+  border-radius: 8px;
+  color: white;
+  background:
+    linear-gradient(180deg, rgba(10, 10, 10, 0.14), rgba(10, 10, 10, 0.88)),
+    url('https://images.unsplash.com/photo-1519500528352-2d1460418d41?auto=format&fit=crop&w=1400&q=85') center / cover;
+  box-shadow: 0 20px 55px rgba(15, 23, 42, 0.14);
+}
+
+.signup-art {
+  background:
+    linear-gradient(180deg, rgba(10, 10, 10, 0.18), rgba(10, 10, 10, 0.86)),
+    url('https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=1400&q=85') center / cover;
+}
+
+.auth-art .eyebrow {
+  color: #f2c17d;
+}
+
+.auth-art h1 {
+  max-width: 720px;
+  font-size: clamp(2.4rem, 5vw, 5rem);
+  line-height: 1;
+}
+
+.auth-art p {
+  max-width: 560px;
+  color: rgba(255, 255, 255, 0.78);
+  line-height: 1.7;
+}
+
+.auth-art .map-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0.85rem 1.2rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 800;
+}
+
+.auth-box {
+  align-self: center;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  box-shadow: 0 20px 55px rgba(15, 23, 42, 0.08);
 }
 
 @media (max-width: 900px) {
@@ -1627,9 +1703,46 @@ body {
   border-radius: 8px;
 }
 
+.user-role-header {
+  margin-top: 2rem;
+}
+
+.role-select {
+  min-width: 150px;
+  padding: 0.75rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: white;
+  color: var(--ink);
+}
+
+.status-badge.customer {
+  background: #e0f2fe;
+  color: #075985;
+}
+
+.status-badge.barber {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-badge.admin,
+.status-badge.superadmin {
+  background: #dcfce7;
+  color: #166534;
+}
+
 @media (max-width: 900px) {
   .testimonial-grid {
     grid-template-columns: 1fr;
+  }
+
+  .auth-page {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-art {
+    min-height: 420px;
   }
 
   .home-carousel {

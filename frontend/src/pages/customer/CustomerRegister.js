@@ -95,7 +95,7 @@ const CustomerRegister = () => {
           </button>
         </form>
         <p className="register-link">
-          Already have an account? <Link to="/customer/login">Login</Link>
+          Already have an account? <Link to="/login">Login</Link>
         </p>
       </div>
     </div>

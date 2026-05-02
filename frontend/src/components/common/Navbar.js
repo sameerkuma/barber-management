@@ -13,11 +13,11 @@ const Navbar = () => {
     }
   })();
   const activeUser = user || storedUser;
-  const dashboardPath = activeUser?.role === 'superadmin'
+  const dashboardPath = activeUser?.role === 'superadmin' || activeUser?.role === 'admin'
     ? '/superadmin/dashboard'
     : activeUser?.role === 'customer'
       ? '/customer/dashboard'
-      : activeUser?.role === 'barber' || activeUser?.role === 'admin'
+      : activeUser?.role === 'barber'
         ? '/barber/dashboard'
         : '/';
 
@@ -34,21 +34,34 @@ const Navbar = () => {
       <div className="nav-links">
         {!user ? (
           <>
-            <NavLink to="/superadmin/login">Super Admin</NavLink>
-            <NavLink to="/barber/login">Barber Login</NavLink>
-            <NavLink to="/customer/login">Customer Login</NavLink>
+            <NavLink to="/signup">Signup</NavLink>
+            <NavLink to="/login">Login</NavLink>
+            <a
+              href="https://www.google.com/maps/search/?api=1&query=barber+shop"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Map
+            </a>
           </>
         ) : (
           <>
-            {user.role === 'superadmin' && (
+            {(user.role === 'superadmin' || user.role === 'admin') && (
               <NavLink to="/superadmin/dashboard">Dashboard</NavLink>
             )}
-            {(user.role === 'barber' || user.role === 'admin') && (
+            {user.role === 'barber' && (
               <NavLink to="/barber/dashboard">Dashboard</NavLink>
             )}
             {user.role === 'customer' && (
               <NavLink to="/customer/dashboard">Dashboard</NavLink>
             )}
+            <a
+              href="https://www.google.com/maps/search/?api=1&query=barber+shop"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Map
+            </a>
             <button onClick={handleLogout} className="logout-btn">Logout</button>
           </>
         )}

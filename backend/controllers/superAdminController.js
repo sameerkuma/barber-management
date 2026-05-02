@@ -1,4 +1,5 @@
 const Tenant = require('../models/Tenant');
+const User = require('../models/User');
 const auth = require('../middleware/auth');
 
 const superAdminController = {
@@ -131,6 +132,50 @@ const superAdminController = {
     } catch (error) {
       console.error('Delete tenant error:', error);
       res.status(500).json({ message: 'Failed to delete tenant.', error: error.message });
+    }
+  },
+
+  getAllUsers: async (req, res) => {
+    try {
+      const users = await User.find().select('-password').sort({ createdAt: -1 });
+      res.status(200).json({ users });
+    } catch (error) {
+      console.error('Get users error:', error);
+      res.status(500).json({ message: 'Failed to fetch users.', error: error.message });
+    }
+  },
+
+  updateUserRole: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { role } = req.body;
+      const allowedRoles = ['customer', 'barber', 'admin'];
+
+      if (!allowedRoles.includes(role)) {
+        return res.status(400).json({ message: 'Invalid role.' });
+      }
+
+      const user = await User.findById(id);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found.' });
+      }
+
+      user.role = role;
+      await user.save();
+
+      res.status(200).json({
+        message: 'User role updated successfully.',
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          role: user.role
+        }
+      });
+    } catch (error) {
+      console.error('Update user role error:', error);
+      res.status(500).json({ message: 'Failed to update user role.', error: error.message });
     }
   },
 

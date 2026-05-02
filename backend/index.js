@@ -7,6 +7,7 @@ const Service = require('./models/Service');
 const User = require('./models/User');
 const Appointment = require('./models/Appointment');
 const auth = require('./middleware/auth');
+const authRoutes = require('./routes/auth');
 const superAdminRoutes = require('./routes/superAdmin');
 const barberRoutes = require('./routes/barber');
 const customerRoutes = require('./routes/customer');
@@ -40,6 +41,7 @@ app.get('/ping', (req, res) => {
 });
 
 // routes
+app.use('/api/auth', authRoutes);
 app.use('/api/superadmin', superAdminRoutes);
 app.use('/api/barber', barberRoutes);
 app.use('/api/customer', customerRoutes);
@@ -110,6 +112,34 @@ const seedDefaultBarber = async () => {
   }
 };
 
+const seedDefaultAdmin = async () => {
+  const email = process.env.SUPER_ADMIN_EMAIL || 'admin@gmail.com';
+  const password = process.env.SUPER_ADMIN_PASSWORD || 'admin123';
+  const hashedPassword = await auth.hashPassword(password);
+
+  const admin = await User.findOne({ email });
+
+  if (!admin) {
+    await User.create({
+      name: 'Admin',
+      email,
+      password: hashedPassword,
+      phone: '9999999999',
+      role: 'admin'
+    });
+    console.log(`Seeded default admin account: ${email}`);
+    return;
+  }
+
+  if (admin.role !== 'admin') {
+    admin.role = 'admin';
+    console.log(`Updated default admin account role: ${email}`);
+  }
+
+  admin.password = hashedPassword;
+  await admin.save();
+};
+
 const seedDemoAppointments = async () => {
   const count = await Appointment.countDocuments();
   if (count > 0) return;
@@ -176,6 +206,7 @@ const startServer = async () => {
   try {
     await connectDB('barber-management');
     await seedServices();
+    await seedDefaultAdmin();
     await seedDefaultBarber();
     await seedDemoAppointments();
     app.listen(PORT, () => {
